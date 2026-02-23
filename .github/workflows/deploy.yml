@@ -1,0 +1,33 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # ให้ทำงานเมื่อมีการ Push โค้ดเข้า branch main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: 🏗️ Build Frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: 🚀 Deploy to hosting (ตัวอย่างการนำไปใช้)
+        # ตรงนี้สามารถใส่ Action สำหรับ Deploy ไปยังเซิร์ฟเวอร์ที่คุณต้องการได้
+        # เช่น Netlify, Vercel, AWS S3, หรือ FTP Server
+        run: echo "🎉 Build completed. Ready to deploy ./frontend/dist"
