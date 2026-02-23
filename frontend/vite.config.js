@@ -9,6 +9,7 @@ const __dirname = dirname(__filename)
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/IELTS-Test/',
   plugins: [react()],
   root: resolve(__dirname, '..'),
   build: {
