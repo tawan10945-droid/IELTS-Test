@@ -14,7 +14,7 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         if (!token) {
-            navigate('/admin/login');
+            navigate('/admin/Login');
             return;
         }
         fetchData();
@@ -60,7 +60,7 @@ const AdminDashboard = () => {
     const handleLogout = () => {
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminUser');
-        navigate('/admin/login');
+        navigate('/admin/Login');
     };
 
     if (isLoading) {

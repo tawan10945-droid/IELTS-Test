@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children }) => {
 const AdminProtectedRoute = ({ children }) => {
   const adminToken = localStorage.getItem('adminToken');
   if (!adminToken) {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/admin/Login" replace />;
   }
   return children;
 };
@@ -31,7 +31,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/Login" element={<AdminLogin />} />
           <Route
             path="/admin/dashboard"
             element={
