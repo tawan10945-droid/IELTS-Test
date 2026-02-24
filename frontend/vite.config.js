@@ -12,6 +12,7 @@ export default defineConfig({
   base: '/IELTS-Test/',
   plugins: [react()],
   root: resolve(__dirname, '..'),
+  envDir: __dirname,
   build: {
     outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true
