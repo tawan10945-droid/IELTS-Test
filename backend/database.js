@@ -17,10 +17,15 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 role TEXT DEFAULT 'user',
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )`, () => {
-                // Ensure default admin exists
-                const bcrypt = require('bcryptjs');
-                const adminPassword = bcrypt.hashSync('admin123', 10);
-                db.run('INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)', ['admin', adminPassword, 'admin']);
+                // Try to add the role column for existing databases (will error safely if it already exists)
+                db.run("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'", (err) => {
+                    // Ignore error if column already exists
+
+                    // Ensure default admin exists
+                    const bcrypt = require('bcryptjs');
+                    const adminPassword = bcrypt.hashSync('admin123', 10);
+                    db.run('INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)', ['admin', adminPassword, 'admin']);
+                });
             });
 
             db.run(`CREATE TABLE IF NOT EXISTS results (
