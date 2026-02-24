@@ -27,7 +27,7 @@ const AdminProtectedRoute = ({ children }) => {
 function App() {
   return (
     <div className="app-container">
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
