@@ -19,16 +19,17 @@ const TestInterface = () => {
       try {
         const token = localStorage.getItem('token');
         const config = {
-          headers: { Authorization: `Bearer ${token}` } };
-        
+          headers: { Authorization: `Bearer ${token}` }
+        };
+
         // Fetch Questions
-        const qRes = await axios.get('http://localhost:5000/api/test/questions', config);
+        const qRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/test/questions`, config);
         setQuestions(qRes.data);
-        
+
         // Fetch Answers Key
-        const aRes = await axios.get('http://localhost:5000/api/test/answers', config);
+        const aRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/test/answers`, config);
         setAnswerKey(aRes.data);
-        
+
       } catch (err) {
         console.error('Failed to load test data', err);
         if (err.response?.status === 401) {
@@ -71,7 +72,7 @@ const TestInterface = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/api/test/submit',
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/test/submit`,
         { answers: submitData },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -119,11 +120,11 @@ const TestInterface = () => {
                 <div style={{ fontWeight: 600, marginBottom: '1rem' }}>
                   {idx + 1}. {q.text}
                 </div>
-                
+
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {q.options.map((opt, optIdx) => {
                     let optionStyle = { padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center' };
-                    
+
                     if (optIdx === correctAns) {
                       optionStyle.background = 'rgba(16, 185, 129, 0.1)';
                       optionStyle.border = '1px solid var(--success-color)';
@@ -152,11 +153,11 @@ const TestInterface = () => {
             );
           })}
         </div>
-        
+
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-            <button className="btn-primary" onClick={() => navigate('/dashboard')}>
-              Back to Dashboard
-            </button>
+          <button className="btn-primary" onClick={() => navigate('/dashboard')}>
+            Back to Dashboard
+          </button>
         </div>
       </div>
     );

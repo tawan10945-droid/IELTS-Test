@@ -21,7 +21,7 @@ const Dashboard = () => {
                 const config = { headers: { Authorization: `Bearer ${token}` } };
 
                 // Fetch User Test History
-                axios.get('http://localhost:5000/api/test/history', config)
+                axios.get(`${import.meta.env.VITE_API_URL}/api/test/history`, config)
                     .then(res => setHistory(res.data))
                     .catch(err => {
                         if (err.response?.status === 401) handleLogout();
@@ -30,13 +30,13 @@ const Dashboard = () => {
                     .finally(() => setLoadingHistory(false));
 
                 // Fetch Global Leaderboard
-                axios.get('http://localhost:5000/api/test/leaderboard', config)
+                axios.get(`${import.meta.env.VITE_API_URL}/api/test/leaderboard`, config)
                     .then(res => setLeaderboard(res.data))
                     .catch(err => console.error(err))
                     .finally(() => setLoadingLeaderboard(false));
 
                 // Fetch Correct Answer Key for reference
-                axios.get('http://localhost:5000/api/test/answers', config)
+                axios.get(`${import.meta.env.VITE_API_URL}/api/test/answers`, config)
                     .then(res => setAnswers(res.data))
                     .catch(err => console.error(err));
 
