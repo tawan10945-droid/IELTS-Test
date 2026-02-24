@@ -21,10 +21,13 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 db.run("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'", (err) => {
                     // Ignore error if column already exists
 
-                    // Ensure default admin exists
+                    // Ensure default admin exists using environment variables
+                    const adminUser = process.env.ADMIN_USERNAME || 'admin';
+                    const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
+
                     const bcrypt = require('bcryptjs');
-                    const adminPassword = bcrypt.hashSync('admin123', 10);
-                    db.run('INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)', ['admin', adminPassword, 'admin']);
+                    const adminPassword = bcrypt.hashSync(adminPass, 10);
+                    db.run('INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)', [adminUser, adminPassword, 'admin']);
                 });
             });
 
