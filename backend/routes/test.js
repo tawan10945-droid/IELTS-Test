@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const db = require('../database');
+const pool = require('../database');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_key_ielts';
 
@@ -76,89 +76,79 @@ const ieltsQuestions = [
 
 // Get Questions (Hide correct answers from frontend)
 router.get('/questions', authMiddleware, (req, res) => {
-    // Map array to exclude the correctAnswer field
     const clientQuestions = ieltsQuestions.map(q => ({
         id: q.id,
         text: q.text,
         options: q.options
     }));
-
     res.json(clientQuestions);
 });
 
 // Submit Test
-router.post('/submit', authMiddleware, (req, res) => {
-    const { answers } = req.body; // array of answered option indices
+router.post('/submit', authMiddleware, async (req, res) => {
+    const { answers } = req.body;
 
     if (!answers || !Array.isArray(answers)) {
         return res.status(400).json({ error: 'Answers must be provided as an array' });
     }
 
     let score = 0;
-
-    // Grading logic based on the actual correct answers
     for (let i = 0; i < ieltsQuestions.length; i++) {
-        const userAnswer = answers[i];
-        if (userAnswer === ieltsQuestions[i].correctAnswer) {
+        if (answers[i] === ieltsQuestions[i].correctAnswer) {
             score++;
         }
     }
 
     const bandScore = calculateBandScore(score);
 
-    db.run(
-        'INSERT INTO results (user_id, score, band_score) VALUES (?, ?, ?)',
-        [req.user.userId, score, bandScore],
-        function (err) {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ error: 'Failed to save test result' });
-            }
-
-            res.status(201).json({
-                message: 'Test submitted successfully',
-                resultId: this.lastID,
-                score,
-                bandScore,
-                total: 30
-            });
-        }
-    );
+    try {
+        const [result] = await pool.query(
+            'INSERT INTO results (user_id, score, band_score) VALUES (?, ?, ?)',
+            [req.user.userId, score, bandScore]
+        );
+        res.status(201).json({
+            message: 'Test submitted successfully',
+            resultId: result.insertId,
+            score,
+            bandScore,
+            total: 30
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to save test result' });
+    }
 });
 
 // Get user history
-router.get('/history', authMiddleware, (req, res) => {
-    db.all(
-        'SELECT * FROM results WHERE user_id = ? ORDER BY test_date DESC',
-        [req.user.userId],
-        (err, rows) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ error: 'Failed to fetch history' });
-            }
-            res.json(rows);
-        }
-    );
+router.get('/history', authMiddleware, async (req, res) => {
+    try {
+        const [rows] = await pool.query(
+            'SELECT * FROM results WHERE user_id = ? ORDER BY test_date DESC',
+            [req.user.userId]
+        );
+        res.json(rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch history' });
+    }
 });
 
 // Get Leaderboard (Ranking)
-router.get('/leaderboard', authMiddleware, (req, res) => {
-    db.all(
-        `SELECT users.username, MAX(results.score) as highest_score, MAX(results.band_score) as highest_band, results.test_date 
-         FROM results 
-         JOIN users ON results.user_id = users.id 
-         GROUP BY users.id 
-         ORDER BY highest_score DESC, results.test_date ASC 
-         LIMIT 10`,
-        [],
-        (err, rows) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ error: 'Failed to fetch leaderboard' });
-            }
-            res.json(rows);
-        }
-    );
+router.get('/leaderboard', authMiddleware, async (req, res) => {
+    try {
+        const [rows] = await pool.query(`
+            SELECT users.username, MAX(results.score) as highest_score, MAX(results.band_score) as highest_band, results.test_date
+            FROM results
+            JOIN users ON results.user_id = users.id
+            GROUP BY users.id, users.username, results.test_date
+            ORDER BY highest_score DESC, results.test_date ASC
+            LIMIT 10
+        `);
+        res.json(rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch leaderboard' });
+    }
 });
 
 // Get Answers (Solutions)
