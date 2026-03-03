@@ -111,12 +111,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./frontend/dist
 ```
-
-> **📌 วิธีดูลิงก์เว็บไซต์หลังจาก Deploy:**
-> 1. ไปที่แถบ **Settings** ของ Repository นี้บน GitHub
-> 2. เลื่อนหาเมนู **Pages** ที่แถบด้านซ้าย
-> 3. ตรงหัวข้อ Build and deployment ตรวจสอบให้แน่ใจว่า Source เลือกเป็น `Deploy from a branch` และกำหนดรันจาก Branch ที่ชื่อว่า `gh-pages` 
-> 4. เมื่อ GitHub Actions ทำงานเสร็จ ลิงก์เข้าเว็บไซต์จะปรากฏเป็นกรอบข้อความบริเวณด้านบนหน้าจอนั้น (ตัวอย่าง: `https://[ชื่อคุณ].github.io/IELTS-Test/`)
-
----
 *Created for IELTS practice and general exam learning.*
